@@ -1,8 +1,7 @@
 import { Seat, Violation, MIN_CENTER_DISTANCE } from '@/types';
 
 export function validateDistance(seats: Seat[]): Violation[] {
-  const violations: Violation[] = [];
-  const violatingSeatIds = new Set<number>();
+  const seatViolatingPairs = new Map<number, number[]>();
 
   for (let i = 0; i < seats.length; i++) {
     for (let j = i + 1; j < seats.length; j++) {
@@ -19,16 +18,25 @@ export function validateDistance(seats: Seat[]): Violation[] {
       );
 
       if (distance < MIN_CENTER_DISTANCE) {
-        violatingSeatIds.add(seatA.id);
-        violatingSeatIds.add(seatB.id);
+        if (!seatViolatingPairs.has(seatA.id)) {
+          seatViolatingPairs.set(seatA.id, []);
+        }
+        if (!seatViolatingPairs.has(seatB.id)) {
+          seatViolatingPairs.set(seatB.id, []);
+        }
+        seatViolatingPairs.get(seatA.id)!.push(seatB.id);
+        seatViolatingPairs.get(seatB.id)!.push(seatA.id);
       }
     }
   }
 
-  violatingSeatIds.forEach((seatId) => {
+  const violations: Violation[] = [];
+  seatViolatingPairs.forEach((conflictingIds, seatId) => {
+    const sortedIds = conflictingIds.sort((a, b) => a - b);
+    const idsStr = sortedIds.map((id) => `${id}号席`).join('、');
     violations.push({
       seatId,
-      reason: `与其他席位中心距离小于 ${MIN_CENTER_DISTANCE}px`,
+      reason: `与${idsStr}中心距离小于 ${MIN_CENTER_DISTANCE}px`,
       type: 'distance',
     });
   });

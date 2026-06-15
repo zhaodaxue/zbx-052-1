@@ -18,7 +18,7 @@ export const Seat: React.FC<SeatProps> = ({
   containerRef,
   onDragEnd,
 }) => {
-  const { isDragging, position, handleMouseDown } = useDrag(seat, {
+  const { isDragging, position, handleMouseDown, handleTouchStart } = useDrag(seat, {
     onDragEnd,
     containerRef,
   });
@@ -47,6 +47,7 @@ export const Seat: React.FC<SeatProps> = ({
         height: seat.height,
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <span
         className={`font-bold text-sm ${
