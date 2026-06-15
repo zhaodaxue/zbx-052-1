@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  tea-mat-preview:
+    build: .
+    container_name: tea-mat-preview
+    ports:
+      - "8080:80"
+    restart: unless-stopped
